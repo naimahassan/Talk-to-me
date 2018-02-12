@@ -3,16 +3,16 @@ from werkzeug.security import generate_password_hash,check_password_hash
 from flask_login import UserMixin
 from . import login_manager
 from datetime import datetime
-from sqlalchemy.sql import func
 
 
 @login_manager.user_loader
 def load_user(user_id):
-    return User.query.get(int(user_id))
+    return Doctor.query.get(int(user_id))
 
 
-class Admin:
-    ___tableme__ = 'admin'
+class Admin(UserMixin,db.Model):
+    ___tablename__ = 'admin'
+
     id=  db.Column(db.Integer,primary_key = True)
     username = db.Column(db.String(255))
     profile_pic_path = db.Column(db.String())
@@ -34,8 +34,9 @@ class Admin:
     def __repr__(self):
         return f'User {self.username}'
 
-class Doctor:
-    ___tableme__ = 'doctor'
+class Doctor(UserMixin,db.Model):
+    ___tablename__ = 'doctor'
+
     id=  db.Column(db.Integer,primary_key = True)
     username = db.Column(db.String(255))
     phone_number = db.Column(db.Integer())
@@ -60,10 +61,13 @@ class Doctor:
         return f'User {self.username}'
 
 
-class Patient:
+class Patient(db.Model):
     __tablename__ = 'patient'
+
     id = db.Column(db.Integer,primary_key = True)
     body = db.Column(db.String())
+    com = db.Column(db.String())
+
     talks = db.relationship("Talks", backref="patient", lazy = "dynamic")
 
 
@@ -84,7 +88,9 @@ class Patient:
         return patient
     
 
-class Talks:
+class Talks(db.Model):
+    __tablename__ = 'talks'
+
     id = db.Column(db.Integer,primary_key = True)
     patient_id = db.Column(db.Integer, db.ForeignKey("patient.id"))
 
